@@ -2,50 +2,33 @@ import numpy as np
 import cv2
 import os
 
-def capture_image():
-    # Open the default camera
-    cap = cv2.VideoCapture(0)
-
-    while True:
-        # Capture frame-by-frame
-        ret, frame = cap.read()
-
-        # Display the captured frame
-        cv2.imshow('Press Space to Capture', frame)
-
-        # Wait for the spacebar to be pressed
-        if cv2.waitKey(1) & 0xFF == ord(' '):
-            # Release the camera
-            cap.release()
-            cv2.destroyAllWindows()
-
-            # Save the captured frame as a JPEG image
-            cv2.imwrite('image.jpg', frame)
-
-            print("Image captured and saved as 'captured_image.jpg'")
-            break
 
 
 
 
 
-def Detect():
-    image_path = 'image.jpg' #change the file
-    prototxt_path = 'models/MobileNetSSD_deploy.prototxt'
-    model_path = 'models/MobileNetSSD_deploy.caffemodel'
-    min_confidence = 0.2
 
-    classes = ["background", "aeroplane", "bicycle", "bird", "boat",
+
+image_path = 'image.jpg' #change the file
+prototxt_path = 'models/MobileNetSSD_deploy.prototxt'
+model_path = 'models/MobileNetSSD_deploy.caffemodel'
+min_confidence = 0.2
+
+classes = ["background", "aeroplane", "bicycle", "bird", "boat",
             "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
             "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
             "sofa", "train", "tvmonitor"]
 
-    np.random.seed(543210)
-    colors = np.random.uniform(0, 255, size=(len(classes), 3))
+np.random.seed(543210)
+colors = np.random.uniform(0, 255, size=(len(classes), 3))
 
-    net = cv2.dnn.readNetFromCaffe(prototxt_path, model_path)
+net = cv2.dnn.readNetFromCaffe(prototxt_path, model_path)
 
-    image = cv2.imread(image_path)
+cap = cv2.VideoCapture(0)
+
+while True:
+
+    _, image = cap.read()
     height, width = image.shape[0], image.shape[1]
     blob = cv2.dnn.blobFromImage(cv2.resize(image, (300, 300)), 0.007, (300, 300), 130)
 
@@ -70,11 +53,8 @@ def Detect():
             cv2.putText(image, prediction_text, (upper_left_x, upper_left_y - 15 if upper_left_y > 30 else upper_left_y + 15), cv2.FONT_HERSHEY_TRIPLEX, 0.6, colors[class_index], 2) #2 represents the thickness of the text
 
     cv2.imshow("Detected Objects", image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    cv2.waitKey(5)
+
+cv2.destroyAllWindows()
 
 
-capture_image()
-Detect()
-file_path = 'image.jpg'
-os.remove(file_path)
