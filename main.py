@@ -11,31 +11,31 @@ import os
 
 image_path = 'image.jpg' #change the file
 prototxt_path = 'models/MobileNetSSD_deploy.prototxt'
-model_path = 'models/MobileNetSSD_deploy.caffemodel'
+model_path = 'models/MobileNetSSD_deploy.caffemodel' #trained modules
 min_confidence = 0.2
 
-classes = ["background", "aeroplane", "bicycle", "bird", "boat",
+classes = ["background", "aeroplane", "bicycle", "bird", "boat", #the things it can classify
             "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
             "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
             "sofa", "train", "tvmonitor"]
 
-np.random.seed(543210)
-colors = np.random.uniform(0, 255, size=(len(classes), 3))
+np.random.seed(543210) #chooses the color for the rects
+colors = np.random.uniform(0, 255, size=(len(classes), 3)) #assings colors to rects
 
-net = cv2.dnn.readNetFromCaffe(prototxt_path, model_path)
+net = cv2.dnn.readNetFromCaffe(prototxt_path, model_path) #reads the trained modules
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0) #stars filming
 
-while True:
+while True: #loop
 
-    _, image = cap.read()
-    height, width = image.shape[0], image.shape[1]
-    blob = cv2.dnn.blobFromImage(cv2.resize(image, (300, 300)), 0.007, (300, 300), 130)
+    _, image = cap.read() #sets the image to the current frame in the video
+    height, width = image.shape[0], image.shape[1] #height and width of the rects defined by what parts of the image it classifies as a certain class
+    blob = cv2.dnn.blobFromImage(cv2.resize(image, (300, 300)), 0.007, (300, 300), 130) #idk what the fuck this is but i'm guessing it's the part of the image which is defined as a certain class
 
-    net.setInput(blob)
-    detected_objects = net.forward()
+    net.setInput(blob) #makes the trained modules classify objects from the blob
+    detected_objects = net.forward() #idk wtf
 
-    for i in range(detected_objects.shape[2]):
+    for i in range(detected_objects.shape[2]): #guess 
 
         confidence = detected_objects[0][0][i][2]
 
@@ -52,9 +52,9 @@ while True:
             cv2.rectangle(image, (upper_left_x, upper_left_y), (lower_right_x, lower_right_y), colors[class_index], 3) #3 represents the thickness of the rect
             cv2.putText(image, prediction_text, (upper_left_x, upper_left_y - 15 if upper_left_y > 30 else upper_left_y + 15), cv2.FONT_HERSHEY_TRIPLEX, 0.6, colors[class_index], 2) #2 represents the thickness of the text
 
-    cv2.imshow("Detected Objects", image)
-    cv2.waitKey(5)
+    cv2.imshow("Detected Objects", image) #show results
+    cv2.waitKey(5) #frames NEVER SET TO 0
 
-cv2.destroyAllWindows()
+cv2.destroyAllWindows() #show window
 
 
